@@ -12,8 +12,10 @@ class ConverterViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        inputUnit = "°F"
+        outputUnit = "°C"
+        displayInput()
+        displayOutput()
     }
 
     override func didReceiveMemoryWarning() {
@@ -24,32 +26,62 @@ class ConverterViewController: UIViewController {
     @IBOutlet weak var outputDisplay: UITextField!
     @IBOutlet weak var inputDisplay: UITextField!
     
-    var numberOnInput:Double = 0;
-    var numberOnOutput:Double = 0;
-    
+    var numberOnInput = ""
+    var numberOnOutput = ""
+    var inputUnit: String = "";
+    var outputUnit: String = "";
+
     @IBAction func numbers(_ sender: UIButton) {
+        //inputDisplay.text = inputDisplay.text! + String(sender.tag-1)
+        //numberOnInput = Double(inputDisplay.text!)!
+       // if (self.numberOnInput == 0) {
+       //     numberOnInput = (Double(String(format: ".0f",(sender.tag-1))))
+        //} else{
+         //   numberOnInput = Double(String(self.numberOnInput) + String(sender.tag-1))!
+        var digit = sender.tag-1
+        numberOnInput += String(digit)
         
-        inputDisplay.text = inputDisplay.text! + String(sender.tag-1)
-        numberOnInput = Double(inputDisplay.text!)!
+        /*if (self.numberOnInput == 0) {
+            numberOnInput = (Double(String(self.numberOnInput) + String(sender.tag-1))!)
+        } else {
+            numberOnInput = (Double(String(self.numberOnInput) + String(sender.tag-1))!)
+        }*/
+       // }
+        displayInput()
     }
     
     @IBAction func buttons(_ sender: UIButton) {
-        
-        if inputDisplay.text != "" && sender.tag != 11{
-            if sender.tag == 12 //Subraction Sign
-            {
-                inputDisplay.text = "-" + inputDisplay.text!
-                numberOnInput = Double(inputDisplay.text!)!
+        if sender.tag == 11 {
+            numberOnInput = ""
+            numberOnOutput = ""
+            inputUnit = "°F"
+            outputUnit = "°C"
+            displayInput()
+            displayOutput()
+        }
+        if sender.tag == 12 //Subraction Sign
+        {
+            if numberOnInput.contains("-") {
+                if let i = numberOnInput.index(of: "-") {
+                    numberOnInput.remove(at: i)
+                    displayInput()
             }
-            else if sender.tag == 13 // Decimal Point
-            {
-                inputDisplay.text = inputDisplay.text! + "."
-                numberOnInput = Double(inputDisplay.text!)!
+            } else {
+                numberOnInput = "-" + numberOnInput
+                displayInput()
             }
         }
-        if sender.tag == 11 {
-            outputDisplay.text = ""
-            inputDisplay.text = ""
+        else if sender.tag == 13 // Decimal Point
+        {
+            if numberOnInput.contains(".") {
+                if let i = numberOnInput.index(of: ".") {
+                    numberOnInput.remove(at: i)
+                    displayInput()
+                }
+            } else {
+                numberOnInput = numberOnInput + "."
+                displayInput()
+            }
         }
     }
     
@@ -65,44 +97,52 @@ class ConverterViewController: UIViewController {
     func convertKilometersToMiles(_ kilometers: Double) -> Double {
         return kilometers / 1.60934
     }
+    
+    func displayInput() {
+        self.inputDisplay.text = String(self.numberOnInput) + " " + inputUnit
+    }
+    
+    func displayOutput() {
+        self.outputDisplay.text = String(self.numberOnOutput) + " " + outputUnit
+    }
 
     @IBAction func converterDisplay(_ sender: Any) {
-        
+        let inputValue = Double(numberOnInput)
         let alert = UIAlertController(title: "Converter", message: "Choose what you want to convert.", preferredStyle: UIAlertControllerStyle.actionSheet)
         alert.addAction(UIAlertAction(title: "fahrenheit to celcius", style: UIAlertActionStyle.default, handler: {
             (alertAction) -> Void in
-            self.inputDisplay.text = self.inputDisplay.text! + "°F"
-            self.outputDisplay.text = String(self.convertFahrenheitToCelcius(self.numberOnInput)) + "°C"
+            self.numberOnOutput = String(self.convertFahrenheitToCelcius(inputValue!))
+            self.inputUnit = "°F"
+            self.outputUnit = "°C"
+            self.displayInput()
+            self.displayOutput()
         }))
         alert.addAction(UIAlertAction(title: "celcius to fahrenheit", style: UIAlertActionStyle.default, handler: {
             (alertAction) -> Void in
-           
-            self.inputDisplay.text = self.inputDisplay.text! + "°C"
-            self.outputDisplay.text = String(self.convertCelciusToFahrenheit(self.numberOnInput)) + "°F"
+            self.numberOnOutput = String(self.convertCelciusToFahrenheit(inputValue!))
+            self.inputUnit = "°C"
+            self.outputUnit = "°F"
+            self.displayInput()
+            self.displayOutput()
         }))
         alert.addAction(UIAlertAction(title: "miles to kilometers", style: UIAlertActionStyle.default, handler: {
             (alertAction) -> Void in
-        
-            self.inputDisplay.text = self.inputDisplay.text! + "mi"
-            self.outputDisplay.text = String(self.convertMilesToKilometers(self.numberOnInput)) + "km"
+            self.numberOnOutput = String(self.convertMilesToKilometers(inputValue!))
+            self.inputUnit = "mi"
+            self.outputUnit = "km"
+            self.displayInput()
+            self.displayOutput()
         }))
         alert.addAction(UIAlertAction(title: "kilometers to miles", style: UIAlertActionStyle.default, handler: {
             (alertAction) -> Void in
-          
-            self.inputDisplay.text = self.inputDisplay.text! + "km"
-            self.outputDisplay.text = String(self.convertKilometersToMiles(self.numberOnInput)) + "mi"
+            self.numberOnOutput = String(self.convertKilometersToMiles(inputValue!))
+            self.inputUnit = "°km"
+            self.outputUnit = "mi"
+            self.displayInput()
+            self.displayOutput()
         }))
         self.present(alert, animated: true, completion: nil)
         
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
